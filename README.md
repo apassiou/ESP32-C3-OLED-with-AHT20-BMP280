@@ -7,9 +7,9 @@ This project will create a tiny box with  temperature,  humidity and atmospheric
 
 Chinese AliExpress ESP32-C3 OLED has non standard pinout. SDA/SCL are on pins 5/6 instead of 8/9
 These same pins are used by t he 0.43 inch OLED display
-
+<div align="center">
 <img width="305" height="536" alt="image" src="https://github.com/user-attachments/assets/e799c86a-9a00-4573-95f9-d5127a382f48" />
-
+</div>
 
 ### Wiring
 
