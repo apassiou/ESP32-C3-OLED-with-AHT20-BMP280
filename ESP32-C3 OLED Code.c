@@ -132,7 +132,7 @@ void drawScreen() {
     else {
       u8g2.setFont(u8g2_font_6x10_tr);
       u8g2.setCursor(iconX, line2Y);
-      u8g2.print("Stabl");
+      u8g2.print("pStbl");
     }
 
     u8g2.setFont(u8g2_font_logisoso16_tr);
