@@ -14,8 +14,8 @@
 #define TREND_WINDOW_MS 300000 // 5 minutes minimum pressure data before predicting weather
 // Power modes: 
 // 0 = always on (no sleep) 
-// 1 = light sleep between updates (have to flash by pressing BOOT button due to cpu resets) 
-// 2 = deep sleep between updates (buggy) #define POWER_MODE 1 
+// 1 = light sleep between updates !!!!!!!!!!!!!!!!!!!!!!!!!(after flashing with this, future flashes you have to flash by pressing BOOT button due to cpu resets) !!!!!!!!!!!!!!!!!!!!!!!!!!
+// 2 = deep sleep between updates (buggy)
 #define POWER_MODE 1
 // ====================================================
 
@@ -121,26 +121,33 @@ void drawScreen() {
     if (!pressureFilled && pressureIndex < requiredSamples) { 
       u8g2.setFont(u8g2_font_7x13_tr);
       u8g2.setCursor(iconX, line2Y);
-      u8g2.print("Prs:");
+      u8g2.print("Pres");
     }
     else if (trend < -1.5) {
-      u8g2.drawGlyph(iconX, line2Y, 67); // rain-ish 67 / unstable
+      u8g2.drawGlyph(iconX+5, line2Y, 67); // rain-ish 67 / unstable
     } 
     else if (trend > 1.5) {
-      u8g2.drawGlyph(iconX, line2Y, 70); // sun 70 / improving
+      u8g2.drawGlyph(iconX+5, line2Y, 70); // sun 70 / improving
     } 
     else {
       u8g2.setFont(u8g2_font_6x10_tr);
       u8g2.setCursor(iconX, line2Y);
-      u8g2.print("Stbl");
+      u8g2.print("Stabl");
     }
 
     u8g2.setFont(u8g2_font_logisoso16_tr);
-    u8g2.setCursor(textX+15, line2Y);
+    u8g2.setCursor(textX+18, line2Y);
     u8g2.print(pressure, 0);
+
+    if (!pressureFilled){ //Will show a . in bottom right corner, when it dissapears you know you have 1hr + of samples
+      u8g2.setFont(u8g2_font_6x10_tr);
+      u8g2.setCursor(textX+59, line2Y);
+      u8g2.print(".");     
+    }
   }
 
   u8g2.sendBuffer();
+
 }
 
 // ---------------- SLEEP ----------------
@@ -169,7 +176,6 @@ void setup() {
   if (!bmp.begin(0x76)) {
     bmp.begin(0x77);
   }
-
   delay(1000);
 }
 
