@@ -10,8 +10,9 @@
 
 // ===================== SETTINGS =====================
 #define UPDATE_INTERVAL_MS 4000 // sensor + display update rate
-#define PRESSURE_WINDOW_MS 3600000 // 1 hour worth of pressure data to keep
-#define TREND_WINDOW_MS 300000 // 5 minutes minimum pressure data before predicting weather
+#define PRESSURE_WINDOW_MS 7200000 // 2 hour worth of pressure data to keep
+#define TREND_WINDOW_MS 3600000 // 60 minutes minimum pressure data before predicting weather
+#define FAST_TREND_WINDOW_MS 900000   // 15 minutes to detect sudden pressure changes
 // Power modes: 
 // 0 = always on (no sleep) 
 // 1 = light sleep between updates !!!!!!!!!!!!!!!!!!!!!!!!!(after flashing with this, future flashes you have to flash by pressing BOOT button due to cpu resets) !!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -31,10 +32,12 @@ float pressure = 0;
 //Weather Prediction code
 #define PRESSURE_SAMPLES (PRESSURE_WINDOW_MS / UPDATE_INTERVAL_MS)
 #define TREND_SAMPLES (TREND_WINDOW_MS / UPDATE_INTERVAL_MS)
+#define FAST_TREND_SAMPLES (FAST_TREND_WINDOW_MS / UPDATE_INTERVAL_MS)
 int requiredSamples = TREND_SAMPLES;
 float pressureHistory[PRESSURE_SAMPLES];
 int pressureIndex = 0;
 bool pressureFilled = false;
+static float smoothPressure = 0;
 
 unsigned long lastUpdate = 0;
 bool toggle = false;
@@ -49,9 +52,13 @@ void readSensors() {
     tempF = t.temperature * 9.0 / 5.0 + 32.0;
   }
 
-  pressure = bmp.readPressure() / 100.0;
+  float rawPressure = bmp.readPressure() / 100.0;
 
-  //Store pressure reading
+  // simple smoothing (low-pass filter)
+  if (smoothPressure == 0) smoothPressure = rawPressure;
+  smoothPressure = 0.9 * smoothPressure + 0.1 * rawPressure;
+  pressure = smoothPressure;
+
   pressureHistory[pressureIndex] = pressure;
   pressureIndex = (pressureIndex + 1) % PRESSURE_SAMPLES;
   if (pressureIndex == 0) pressureFilled = true;
@@ -59,12 +66,26 @@ void readSensors() {
 
 float getPressureTrend() {
   int samples = pressureFilled ? PRESSURE_SAMPLES : pressureIndex;
-  if (samples < requiredSamples) return 0; // not enough 5-min data yet
+  if (samples < requiredSamples) return 0;
 
-  int oldIndex = pressureFilled ? pressureIndex : 0;
+  int oldIndex = (pressureIndex - requiredSamples + PRESSURE_SAMPLES) % PRESSURE_SAMPLES;
+  int newIndex = (pressureIndex - 1 + PRESSURE_SAMPLES) % PRESSURE_SAMPLES;
 
   float oldP = pressureHistory[oldIndex];
-  float newP = pressureHistory[(pressureIndex - 1 + PRESSURE_SAMPLES) % PRESSURE_SAMPLES];
+  float newP = pressureHistory[newIndex];
+
+  return newP - oldP;
+}
+
+float getFastPressureTrend() {
+  int samples = pressureFilled ? PRESSURE_SAMPLES : pressureIndex;
+  if (samples < FAST_TREND_SAMPLES) return 0;
+
+  int oldIndex = (pressureIndex - FAST_TREND_SAMPLES + PRESSURE_SAMPLES) % PRESSURE_SAMPLES;
+  int newIndex = (pressureIndex - 1 + PRESSURE_SAMPLES) % PRESSURE_SAMPLES;
+
+  float oldP = pressureHistory[oldIndex];
+  float newP = pressureHistory[newIndex];
 
   return newP - oldP;
 }
@@ -116,6 +137,7 @@ void drawScreen() {
   }
   else {
     float trend = getPressureTrend();
+    float fastTrend = getFastPressureTrend();
 
     u8g2.setFont(u8g2_font_open_iconic_weather_2x_t);
     if (!pressureFilled && pressureIndex < requiredSamples) { 
@@ -123,10 +145,13 @@ void drawScreen() {
       u8g2.setCursor(iconX, line2Y);
       u8g2.print("Pres");
     }
-    else if (trend < -1.5) {
+    else if (fastTrend < -0.3) {
+      u8g2.drawGlyph(iconX+5, line2Y, 67); // strong warning (rain/unstable)
+    }
+    else if (trend < -0.8) {
       u8g2.drawGlyph(iconX+5, line2Y, 67); // rain-ish 67 / unstable
     } 
-    else if (trend > 1.5) {
+    else if (trend > 0.8) {
       u8g2.drawGlyph(iconX+5, line2Y, 70); // sun 70 / improving
     } 
     else {
