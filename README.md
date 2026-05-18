@@ -3,7 +3,9 @@ ESP32 C3 OLED with AHT20+BMP280 to read and output current temperature, humidity
 
 ### Overview
 
-This project will create a tiny box with  temperature,  humidity and atmospheric pressure readings. Atmospheric pressure will follow trends to determine (and display) if weather is getting worse or better (or is stable).
+This project will create a tiny box with  temperature,  humidity and atmospheric pressure readings. Atmospheric pressure trends over the course of the past hour are analyzed to determine (and display) if weather is getting worse or better (or is stable). Readings are made every 4 seconds. Temperature is displayed at all times and humidy and pressure readings swap every time there is a reading (every 4 seconds). This is due to the size of the screen, fitting 3 lines is possible but is far less readable from any distance.
+
+The draw on this setup is so insignificant most USB testers wont be able to pick it up, this means that a portable USB battery should be able to power this device  24/7 for many days if not weeks.
 
 Chinese AliExpress ESP32-C3 OLED has non standard pinout. SDA/SCL are on pins 5/6 instead of 8/9
 These same pins are used by the 0.43 inch OLED display
@@ -26,9 +28,9 @@ Use 30AWG flexible wire, length ~1 inch. Solder the 4 pins from ATH20+BMP280 as 
 
 STL files provided:
 
-Main Case - Bottom cavity is for the AHT20+BMP280 board. Print with Tree supports.
-Divider - Is inserted to divide ESP32 from the AHT20+BMP280 board in order to reduce heat from ESP32 reaching the sensors.
-Lid - Top lid (snaps into  place).
+* **Main Case** - Bottom cavity is for the AHT20+BMP280 board. Print with tree supports.
+* **Divider** - Is inserted into the side channel in order to separate ESP32 from the AHT20+BMP280 board eliminate any heat from ESP32 reaching the sensors.
+* **Lid** - Top lid (snaps into  place).
 
 ### Assembly and the Final Product
 
