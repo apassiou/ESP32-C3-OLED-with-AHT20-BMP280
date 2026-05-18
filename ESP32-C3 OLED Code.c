@@ -152,7 +152,7 @@ void drawScreen() {
       u8g2.drawGlyph(iconX+5, line2Y, 67); // rain-ish 67 / unstable
     } 
     else if (trend > 0.8) {
-      u8g2.drawGlyph(iconX+5, line2Y, 70); // sun 70 / improving
+      u8g2.drawGlyph(iconX+5, line2Y, 69); // sun 69 / improving
     } 
     else {
       u8g2.setFont(u8g2_font_6x10_tr);
