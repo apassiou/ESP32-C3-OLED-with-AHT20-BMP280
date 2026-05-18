@@ -1,4 +1,4 @@
-# ESP32-C3-OLED with AHT20+BMP280
+# ESP32-C3-OLED with AHT20+BMP280 - Weather Monitor
 ESP32 C3 OLED with AHT20+BMP280 to read and output current temperature, humidity and barrometric pressure.
 
 ### Overview
@@ -6,7 +6,7 @@ ESP32 C3 OLED with AHT20+BMP280 to read and output current temperature, humidity
 This project will create a tiny box with  temperature,  humidity and atmospheric pressure readings. Atmospheric pressure will follow trends to determine (and display) if weather is getting worse or better (or is stable).
 
 Chinese AliExpress ESP32-C3 OLED has non standard pinout. SDA/SCL are on pins 5/6 instead of 8/9
-These same pins are used by t he 0.43 inch OLED display
+These same pins are used by the 0.43 inch OLED display
 <div align="center">
 <img width="305" height="536" alt="image" src="https://github.com/user-attachments/assets/e799c86a-9a00-4573-95f9-d5127a382f48" />
 </div>
